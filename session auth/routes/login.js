@@ -28,18 +28,26 @@ router.post('/login',async(req,res)=>{
      bcrypt.compare(password,user.password,(err,result)=>{
         if(result){
          
-          async function tok (){
+          async function tokenCreation (){
 
             const myid= uuidv4();
+            const sessionDurationInSeconds = 3600; 
+            const sessionExpiry = new Date(Date.now() + sessionDurationInSeconds * 1000);
+
+
+            res.cookie('id',myid,{expires:new Date(Date.now()+3600*1000),httpOnly:true})
+
             
             const tokens=new id({
-                token:myid
+                token:myid,
+                expiry:sessionExpiry
             })
 
             await tokens.save()
+
             
           }
-          tok()
+          tokenCreation();
 
             res.send('done')
          

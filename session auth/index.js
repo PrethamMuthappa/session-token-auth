@@ -12,6 +12,9 @@ app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 const mysignup=require('./routes/signup')
 const login=require('./routes/login')
+const autho=require('./middleware/auth')
+const cookieparser=require('cookie-parser');
+app.use(cookieparser())
 async function main(){
  try{
 
@@ -28,6 +31,10 @@ async function main(){
    
     app.get('/loginejs',(req,res)=>{
       res.render('login')
+    })
+
+    app.get('/special',autho,(req,res)=>{
+      res.send('heloo fuckers')
     })
     
     app.use('/',mysignup);

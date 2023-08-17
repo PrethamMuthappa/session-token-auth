@@ -10,6 +10,8 @@ app.set('views',path.join(__dirname , 'views'))
 app.set('view engine','ejs')
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
+const mysignup=require('./routes/signup')
+const login=require('./routes/login')
 async function main(){
  try{
 
@@ -27,6 +29,11 @@ async function main(){
     app.get('/loginejs',(req,res)=>{
       res.render('login')
     })
+    
+    app.use('/',mysignup);
+    app.use('/',login)
+
+    
     app.listen(port,()=>{
       console.log('listening on ' + port )
     })

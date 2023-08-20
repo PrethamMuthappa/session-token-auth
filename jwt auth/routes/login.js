@@ -43,9 +43,7 @@ router.post('/login',async(req,res)=>{
           const secreatekey=process.env.SECRETE_KEY;
 
           const myid= jwt.sign({payload},secreatekey,{expiresIn:'30m'})
-          console.log(myid)
-
-
+        
           res.cookie('ids',myid,
           {expires:new Date(Date.now()+3600*1000),
             httpOnly:true,
@@ -59,8 +57,8 @@ router.post('/login',async(req,res)=>{
 
           const newpayload={
 
-            datset:req.body.email,
-            roles:'editor'
+            user:req.body.email,
+            roles:['normaluser']
           }
 
           const refersh=jwt.sign({newpayload}, reftoken,{expiresIn:"50d"})

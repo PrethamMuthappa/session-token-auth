@@ -25,10 +25,12 @@ const auths=async(req,res,next)=>{
 
         if(decoded.roles=='admin'){
         res.status(505).send('not admin acess')
-
         }
+
+        req.user=decoded
       })
      
+      next();
 
       // authorization for refresh token 
 
@@ -41,8 +43,19 @@ const auths=async(req,res,next)=>{
         if(err)throw err;
 
        if(Date.now()>dec.exp*1000){
-        res.status(505).send('token is expired')
+        res.status(401).send('token is expired')
        }
+
+       const newaccess=jwt.sign(reftoken,refkey,{expiresIn:'25m'})
+
+       res.cookie('ids',newaccess,{
+        expires:new Date(Date.now() + 50 * 24 * 60 * 60 * 1000),
+        httpOnly:true,
+        sameSite:true,
+        secure:true
+
+      })
+
 
        if(dec.roles=='admin'){
         res.status(505).send('only admin acess')

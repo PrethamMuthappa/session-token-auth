@@ -10,7 +10,6 @@ app.set('view engine','ejs')
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 const usermodel=require('../model/user')
-const id=require('../model/jwt')
 const router=express.Router();
 app.use(cookieparser());
 dotenv.config();
@@ -43,7 +42,7 @@ router.post('/login',async(req,res)=>{
 
           const secreatekey=process.env.SECRETE_KEY;
 
-          const myid= jwt.sign({payload},secreatekey,{expiresIn:('30m')})
+          const myid= jwt.sign({payload},secreatekey,{expiresIn:'30m'})
           console.log(myid)
 
 
@@ -64,7 +63,7 @@ router.post('/login',async(req,res)=>{
             roles:'editor'
           }
 
-          const refersh=jwt.sign({newpayload}, reftoken,{expiresIn:("50d")})
+          const refersh=jwt.sign({newpayload}, reftoken,{expiresIn:"50d"})
 
           res.cookie('ref',refersh,{
             expires:new Date(Date.now() + 50 * 24 * 60 * 60 * 1000),

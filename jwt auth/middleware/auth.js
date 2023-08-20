@@ -2,33 +2,63 @@ const express=require('express');
 const app=express();
 app.use(express.urlencoded({extended:true}))
 const cookieparser=require('cookie-parser');
+const jwt=require('jsonwebtoken');
 app.use(express.json())
 app.use(cookieparser())
-const id=require('../model/session')
+const id=require('../model/jwt')
+
+const key=process.env.SECRETE_KEY
+const refkey=process.env.REFRESH
 
 
 const auths=async(req,res,next)=>{
+     
+      const token=req.cookies.ids
+      if(!token){
+        return res.status(505).send('not authorizized');
+      }
 
-    const sessiontoken=req.cookies.id;
 
-    if(!sessiontoken){
-       return res.redirect('/')
-    }
+       jwt.verify(token,key,(err,decoded)=>{
+        if(err)throw err;
+        req.user=decoded;
 
-    const seshtoken= await id.findOne({token:sessiontoken})
-    if(!seshtoken){
-        return res.send('session not found');
-    }
+        if(decoded.roles=='admin'){
+        res.status(505).send('not admin acess')
 
-    currentexpiry=new Date();
+        }
+      })
+     
 
-    if(seshtoken.expiry<currentexpiry){
-        
-        await id.deleteOne({token:sessiontoken})
-        return res.status(401).send('Session expired');
-    }
+      // authorization for refresh token 
 
-    next()    
+      const reftoken=req.cookies.ref;
+      if(!reftoken){
+        res.status(505).send('no ref')
+      }
+
+      jwt.verify(reftoken, refkey,(err,dec)=>{
+        if(err)throw err;
+
+       if(Date.now()>dec.exp*1000){
+        res.status(505).send('token is expired')
+       }
+
+       if(dec.roles=='admin'){
+        res.status(505).send('only admin acess')
+       }
+
+        req.user=dec
+    
+      })
+
+
+
+      
+
+      next()
 }
+
+
 
 module.exports=auths;

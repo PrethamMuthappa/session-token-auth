@@ -1,17 +1,20 @@
 const express=require('express');
 const path=require('path');
 const app=express();
+const dotenv=require('dotenv');
 const bcrypt=require('bcrypt');
 const cookieparser=require('cookie-parser')
-const {v4 : uuidv4}=require('uuid')
+const jwt=require('jsonwebtoken');
 app.set('views',path.join(__dirname , 'views'))
 app.set('view engine','ejs')
 app.use(express.urlencoded({extended:true}))
 app.use(express.json())
 const usermodel=require('../model/user')
-const id=require('../model/session')
+const id=require('../model/jwt')
 const router=express.Router();
 app.use(cookieparser());
+dotenv.config();
+
 
 
 router.post('/login',async(req,res)=>{
@@ -30,26 +33,52 @@ router.post('/login',async(req,res)=>{
          
           async function tokenCreation (){
 
-            const myid= uuidv4();
-            const sessionDurationInSeconds = 3600; 
-            const sessionExpiry = new Date(Date.now() + sessionDurationInSeconds * 1000);
-
-
-            res.cookie('id',myid,{expires:new Date(Date.now()+3600*1000),httpOnly:true})
-
             
-            const tokens=new id({
-                token:myid,
-                expiry:sessionExpiry
-            })
-
-            await tokens.save()
-
             
+           const payload={
+
+            user:req.body.email,
+            roles:['normaluser']
+           }
+
+          const secreatekey=process.env.SECRETE_KEY;
+
+          const myid= jwt.sign({payload},secreatekey,{expiresIn:('30m')})
+          console.log(myid)
+
+
+          res.cookie('ids',myid,
+          {expires:new Date(Date.now()+3600*1000),
+            httpOnly:true,
+            sameSite:true,
+            secure:true
+          })
+
+          // create a referesh token 
+
+          const reftoken=process.env.REFRESH
+
+          const newpayload={
+
+            datset:req.body.email,
+            roles:'editor'
+          }
+
+          const refersh=jwt.sign({newpayload}, reftoken,{expiresIn:("50d")})
+
+          res.cookie('ref',refersh,{
+            expires:new Date(Date.now() + 50 * 24 * 60 * 60 * 1000),
+            httpOnly:true,
+            sameSite:true,
+            secure:true
+
+          })
+
+                        
           }
           tokenCreation();
 
-            res.send('done')
+            res.redirect('/special')
          
         }
         else{

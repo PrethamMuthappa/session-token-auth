@@ -25,7 +25,7 @@ const auths = async (req, res, next) => {
       return res.status(403).send('Admin access not allowed');
     }
 
-    next(); // Continue to the refresh token authorization
+    next(); 
   });
 
   const reftoken = req.cookies.ref;
@@ -42,7 +42,7 @@ const auths = async (req, res, next) => {
       return res.status(401).send('Token is expired');
     }
 
-    // Create a new access token using the user information from the decoded refresh token
+    
     const newAccessToken = jwt.sign({ user: dec.user, roles: dec.roles }, key, {
       expiresIn: '25m'
     });

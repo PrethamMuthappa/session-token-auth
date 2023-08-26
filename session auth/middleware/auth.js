@@ -12,12 +12,12 @@ const auths=async(req,res,next)=>{
     const sessiontoken=req.cookies.id;
 
     if(!sessiontoken){
-       return res.send("not authorizidez")
+       return res.redirect('/')
     }
 
     const seshtoken= await id.findOne({token:sessiontoken})
     if(!seshtoken){
-       return res.send('seshion not found');
+        return res.send('session not found');
     }
 
     currentexpiry=new Date();

@@ -1,5 +1,4 @@
 const express=require('express');
-const mongoose=require('mongoose');
 const path=require('path');
 const dotenv=require('dotenv');
 dotenv.config();
@@ -13,6 +12,7 @@ app.use(express.json())
 const mysignup=require('./routes/signup')
 const login=require('./routes/login')
 const autho=require('./middleware/auth')
+const logo=require("./routes/logout")
 const cookieparser=require('cookie-parser');
 app.use(cookieparser())
 async function main(){
@@ -25,7 +25,7 @@ async function main(){
       res.render('index')
     })
 
-    app.get('/signejs',(reqq,res)=>{
+    app.get('/signejs',(req,res)=>{
       res.render('signup')
     })
    
@@ -39,6 +39,7 @@ async function main(){
     
     app.use('/',mysignup);
     app.use('/',login)
+    app.use('/',logo)
 
     
     app.listen(port,()=>{
